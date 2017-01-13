@@ -1,0 +1,163 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!--
+    Document   : CodigosVista
+    Created on : Sep 20, 2011, 3:41:19 PM
+    Author     : luisfernando
+-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:icecore="http://www.icefaces.org/icefaces/core"
+      xmlns:ace="http://www.icefaces.org/icefaces/components"
+      xmlns:ice="http://www.icesoft.com/icefaces/component"
+      >
+    <h:head>
+
+    </h:head>
+    <h:body styleClass="ice-skin-xp">
+
+        <ui:composition template="../plantillas/plantilla.xhtml">
+            <icecore:singleSubmit/>
+            <!-- Aqui va todo el codigo de la pagina -->
+            <ui:define name="content">
+                <ace:panel id="panel"
+                           header="#{productosxProveedor.perfil.menu.texto}"
+                           closable="false"
+                           toggleable="true">
+                    <ice:panelGrid columns="2">
+                        <ice:outputLabel value="Categoria:" />
+                        <ice:selectOneMenu value="#{productos.categoria}" partialSubmit="true">
+                            <f:selectItems value="#{tablaDeCodigos.categoriaProductos}"/>
+                        </ice:selectOneMenu>
+                        <ice:outputLabel value="Producto:" for="prod" />
+                        <ice:selectOneMenu value="#{productosxProveedor.producto}" partialSubmit="true">
+                            <f:selectItems value="#{productos.comboProductos}"/>
+                        </ice:selectOneMenu>
+                        <ice:outputLabel value="Proveedor:" for="prov" />
+                        <ice:selectOneMenu value="#{productosxProveedor.proveedor}" partialSubmit="true">
+                            <f:selectItems value="#{proveedores.comboProveedores}"/>
+                        </ice:selectOneMenu>
+                    </ice:panelGrid>
+                    <ice:panelGrid columns="2"> 
+                        <ace:menuBar autoSubmenuDisplay="true" >
+                            <ace:menuItem value="Buscar" icon="ui-icon ui-icon-search"  action="#{productosxProveedor.buscar()}" />
+                        </ace:menuBar>
+                        <ice:outputConnectionStatus/>
+                    </ice:panelGrid>
+                    <ace:messages/>
+                </ace:panel>
+
+                <ace:panel 
+                    header="Resultado Búsqueda"
+                    closable="false"
+                    toggleable="true"              >
+                    <h:panelGrid columns="3" styleClass="centeredPanelGrid">
+                        <ice:outputLabel  value="Exportar a:"/>
+                        <h:selectOneRadio  value="#{productosxProveedor.formulario.pantalla}" required="true">
+                            <f:ajax disabled="false"/>
+                            <f:selectItem itemValue="csv" itemLabel="CSV"/>
+                            <f:selectItem itemValue="pdf" itemLabel="PDF"/>
+                            <f:selectItem itemValue="xls" itemLabel="XLS"/>
+                            <f:selectItem itemValue="xml" itemLabel="XML"/>
+                        </h:selectOneRadio>
+                        <ace:dataExporter id="dataExporter" 
+                                          label="Exportar Archivo" 
+                                          type="#{productosxProveedor.formulario.pantalla}" 
+                                          target="tabla" fileName="datos"/>
+                    </h:panelGrid>
+                    <h:panelGrid width="100%">
+                        <ace:dataTable id="tabla" 
+                                       paginatorAlwaysVisible="true"
+                                       value="#{productosxProveedor.listaProdxProve}"
+                                       var="item"
+                                       paginator="true"
+                                       lazy="true"
+                                       resizableColumns="true"
+                                       rowIndexVar="row"
+                                       paginatorPosition="both"
+                                       rowsPerPageTemplate="5,10,15,30,50,100"
+                                       currentPageReportTemplate="{totalRecords} Registro(s) encontrado(s). Página(s): {currentPage} de {totalPages}"
+                                       paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                       rows="30" >
+                            <ace:column  headerText="Registro" style="text-align: right">
+                                <h:outputText value="#{row+1}"/>
+                            </ace:column>
+                            <ace:column headerText="Acciones" style="text-align: left" >
+                                <ace:menuButton id="menuButton" effect="slide" effectDuration="200" value="..." >
+                                    <ace:menuItem action="#{productosxProveedor.detalle()}" value="Detalle" icon="ui-icon ui-icon-search"/>
+                                </ace:menuButton>
+                            </ace:column> 
+                            <ace:column  headerText="Producto"  style="text-align: left" >
+                                <h:outputText  value="#{item.producto.nombre}"/>
+                            </ace:column>
+                            <ace:column  headerText="Proveedor"  style="text-align: left" >
+                                <h:outputText  value="#{item.proveedor.nombre}"/>
+                            </ace:column>
+                        </ace:dataTable>
+                    </h:panelGrid>
+                </ace:panel>
+
+
+                <ace:dialog 
+                    header="#{productosxProveedor.perfil.menu.texto}"                    
+                    closable="false"
+                    modal="true"
+                    draggable="false"
+                    showEffect="clip"
+                    hideEffect="fade"
+                    rendered="#{productosxProveedor.formulario.mostrar}"
+                    visible="#{productosxProveedor.formulario.mostrar}">
+
+                    <ace:tabSet>
+                        <ace:tabPane>
+                            <f:facet name="label">Proveedor</f:facet>
+                            <h:panelGrid columns="2"  >
+                                <ice:outputLabel value="Cod:" for="codprov" />
+                                <ice:outputLabel id="codprov" value="#{productosxProveedor.proveedor.codigo}" title="codprov" />
+                                <ice:outputLabel value="Nombre:" for="nomprov" />
+                                <ice:outputLabel id="nomprov" value="#{productosxProveedor.proveedor.nombre}" title="nomprov" />
+                                <ice:outputLabel value="Direcciòn:" for="dirprov" />
+                                <ice:outputLabel id="dirprov" value="#{productosxProveedor.proveedor.direccion.toString()}" title="dirprov" />
+                                <ice:outputLabel value="Web:" for="webprov" />
+                                <ice:outputLabel id="webprov" value="#{productosxProveedor.proveedor.web}" title="webprov" />
+                                <ice:outputLabel value="Ruc:" for="rucprov" />
+                                <ice:outputLabel id="rucprov" value="#{productosxProveedor.proveedor.ruc}" title="rucprov" />
+                                <ice:outputLabel value="Descripciòn:" for="descprov" />
+                                <ice:outputLabel id="descprov" value="#{productosxProveedor.proveedor.descripcion}" title="descprov" />
+                            </h:panelGrid>
+                        </ace:tabPane>
+                        <ace:tabPane>
+                            <f:facet name="label">Producto</f:facet>   
+                            <h:panelGrid columns="2"  >
+                                <ice:outputLabel value="Cod:" for="codprod" />
+                                <ice:outputLabel id="codprod" value="#{productosxProveedor.producto.codigo}" title="codprod" />
+                                <ice:outputLabel value="Nombre:" for="nomprod" />
+                                <ice:outputLabel id="nomprod" value="#{productosxProveedor.producto.nombre}" title="nomprod" />
+                                <ice:outputLabel value="Categorìa:" for="catprod" />
+                                <ice:outputLabel id="catprod" value="#{productosxProveedor.producto.categoria.nombre}" title="catprod" />
+                                <ice:outputLabel value="Unidad de medida:" for="umprod" />
+                                <ice:outputLabel id="umprod" value="#{productosxProveedor.producto.unidadMedida.nombre}" title="umprod" />
+                                <ice:outputLabel value="Precio:" for="precprod" />
+                                <ice:outputLabel id="precprod" value="#{productosxProveedor.producto.precio}" title="precprod" />
+                                <ice:outputLabel value="Stock:" for="stprod" />
+                                <ice:outputLabel id="stprod" value="#{productosxProveedor.producto.stock}" title="stprod" />
+                                <ice:outputLabel value="Imagen:" for="descprov" rendered="#{productosxProveedor.producto.imagen.archivo!=null}" />
+                                <ice:graphicImage value="#{archivosBean.traerArchivo(productosxProveedor.producto.imagen.id).archivo}" id="resourceGraphicImage" style="height: 50px " />
+                            </h:panelGrid>
+                        </ace:tabPane>
+                    </ace:tabSet>
+                    <ice:panelGrid columns="1" width="100%">
+                        <ace:menuBar autoSubmenuDisplay="true" >
+                            <ace:menuItem value="Salir" icon="ui-icon ui-icon-close" 
+                                          action="#{productosxProveedor.formulario.cancelar()}"/>
+                        </ace:menuBar>
+                        <ace:messages />
+                    </ice:panelGrid>
+                </ace:dialog>
+            </ui:define>
+            <!-- Fin -->
+        </ui:composition>
+    </h:body>
+</html>

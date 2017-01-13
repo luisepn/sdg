@@ -1,0 +1,8 @@
+/dist/
+/build/
+/sgd-ejb/build/
+/sgd-ejb/dist/
+/sgd-ejb/nbproject/private/
+/sgd-war/build/
+/sgd-war/dist/
+/sgd-war/nbproject/private/
