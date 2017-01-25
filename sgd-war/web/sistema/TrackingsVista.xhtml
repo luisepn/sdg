@@ -1,0 +1,549 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ace="http://www.icefaces.org/icefaces/components"
+      xmlns:ice="http://www.icesoft.com/icefaces/component"
+      >
+    <h:head>
+        <f:metadata>
+
+        </f:metadata>
+    </h:head>
+    <h:body >
+        <ui:composition template="../plantillas/plantilla.xhtml">
+            <!-- Aqui va todo el codigo de la pagina -->
+            <ui:define name="content">
+                <!--                        Procesamiento de denuncias -->
+                <ace:panel header="Procesamiento">
+                    <!-- Vista principal: Criterios de busqueda y resultado de busqueda -->
+                    <ace:panel header="Criterios de Búsqueda">
+                        <h:panelGrid columns="8">
+                            <h:outputLabel value="Año : "/>
+                            <h:inputText value="#{trackingsCP.anio}"/>
+<!--                            <h:outputLabel value="Dirección:" rendered="#{seguridadCP.usuarioLoggeado.direccion eq null}" />
+                            <ice:selectOneMenu value="#{trackingsCP.direccion}"  style="width: 300px;" rendered="#{seguridadCP.usuarioLoggeado.direccion eq null}" >
+                                <f:selectItems value="#{procesosCP.comboDirecciones}"/>                            
+                            </ice:selectOneMenu>-->
+                            <h:outputLabel value="Código"/>
+                            <h:inputText value="#{trackingsCP.codigo}"/>
+                            <!--                            <h:outputLabel value="Fecha Ingreso:"/>
+                                                        <ace:dateTimeEntry navigator="true" value="#{trackingsCP.fechaingreso}" 
+                                                                           popupIcon="ui-icon ui-icon-calendar" renderAsPopup="true" 
+                                                                           pattern="dd/MM/yyyy" label="dd/MM/yyyy" labelPosition="infield">
+                                                        </ace:dateTimeEntry>-->
+                            <h:outputLabel value="Medio de Ingreso:"/>
+                            <h:inputText value="#{trackingsCP.tipoingreso}" />
+                            <h:outputLabel value="Procedimiento :"/>
+                            <ice:selectOneMenu value="#{flujosCP.area}"  style="width: 300px;">
+                                <f:selectItems value="#{areasCP.comboareas}"/>                            
+                            </ice:selectOneMenu>
+                            <h:outputLabel value="Descripción"/>
+                            <h:inputText value="#{trackingsCP.descripcion}" />
+<!--                            <h:outputLabel value="Flujo:"/>
+                            <ice:selectOneMenu value="#{trackingsCP.flujobuscar}"  style="width: 300px;">
+                                <f:selectItems value="#{flujosCP.comboflujosArea}"/>                              
+                            </ice:selectOneMenu>-->
+                        </h:panelGrid>
+                        <h:panelGrid columns="2">
+                            <ace:menuBar autoSubmenuDisplay="true">
+                                <ace:menuItem value="Buscar" 
+                                              icon="ui-icon ui-icon-search"
+                                              action="#{trackingsCP.buscar()}"/>
+                            </ace:menuBar>
+                        </h:panelGrid>
+                    </ace:panel>
+                    <!--                        Vista y acciones de Vista principal -->
+                    <ace:panel header="Resultado Búsqueda">
+                        <h:panelGrid columns="1" width="100%">
+                            <ace:dataTable 
+                                value="#{trackingsCP.listaProcesos}" 
+                                var="item"
+                                paginatorAlwaysVisible="true"
+                                lazy="true"
+                                paginator="true"
+                                resizableColumns="true"
+                                rowIndexVar="row"
+                                paginatorPosition="both"
+                                rowsPerPageTemplate="10,15,50"
+                                currentPageReportTemplate="{totalRecords} Proceso(s) encontrado(s). Página(s): {currentPage} de {totalPages}"
+                                paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                rows="5"
+                                style="width: 100%;"
+                                >
+                                <ace:column headerText="Acciones" style="text-align: left">
+                                    <ace:menuButton id="menuButton" effect="slide" effectDuration="200" value="..." >
+                                        <ace:menuItem action="#{trackingsCP.asignar(item)}" value="#{item.flujo.nombre}" icon="ui-icon ui-icon-pencil" rendered="#{trackingsCP.controlAccion(item.flujo)}" /> 
+                                        <ace:menuItem action="#{trackingsCP.registrar(item)}" value="Registrar Respuesta" icon="ui-icon ui-icon-mail-closed" rendered="#{trackingsCP.controlEnvio(item.flujo)}" />
+                                        <ace:menuItem action="#{trackingsCP.historiar(item)}" value="Historial" icon="ui-icon ui-icon-script"/>
+                                    </ace:menuButton>
+                                </ace:column>
+                                <ace:column headerText="Fecha Ingreso" style="text-align: left" >
+                                    <h:outputText value="#{item.fechaingreso}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputText>
+                                </ace:column>
+                                <ace:column headerText="Fecha Inicio" style="text-align: left" >
+                                    <h:outputText value="#{item.fechainicio}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </h:outputText>
+                                </ace:column>
+                                <ace:column headerText="Código" style="text-align: left" >
+                                    <h:outputText value="#{item.codigo}"/>                                     
+                                </ace:column>
+                                <!--                                <ace:column headerText="Solicitante/Denunciante" style="text-align: left">
+                                                                    <h:outputText value="#{item.denunciante.apellidos} #{item.denunciante.nombres}"/>                                     
+                                                                </ace:column>
+                                                                <ace:column headerText="Denunciado" style="text-align: left">
+                                                                    <h:outputText value="#{item.denunciado.nombre} #{item.denunciado.nombrelocal}"/>                                     
+                                                                </ace:column>-->
+                                <ace:column headerText="Medio de Ingreso" style="text-align: left">
+                                    <h:outputText value="#{item.tipoingreso}"/>
+                                </ace:column>
+                                <ace:column headerText="Procedimiento" style="text-align: left">
+                                    <h:outputText value="#{item.area.nombre}"/>
+                                </ace:column>
+                                <ace:column headerText="Descripción" style="text-align: left">
+                                    <h:outputText value="#{item.descripcion}"/>
+                                </ace:column>
+                                <ace:column headerText="Flujo" style="text-align: left">
+                                    <h:outputText value="#{item.flujo.nombre}"/>
+                                </ace:column>
+                                <ace:column headerText="Producto" style="text-align: left">
+                                    <h:outputText value="#{item.nombresubact}"/>
+                                </ace:column>
+                                <ace:column headerText="Fecha Planificación" style="text-align: left" >
+                                    <h:outputText value="#{item.fechaplanificacion}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </h:outputText>
+                                </ace:column>
+                                <ace:column headerText="Fecha Asignación" style="text-align: left" >
+                                    <h:outputText value="#{item.fechaasignacion}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </h:outputText>
+                                </ace:column>
+                            </ace:dataTable>
+                        </h:panelGrid>
+                    </ace:panel>
+                    <ace:messages/>
+                </ace:panel>
+                <!--                        Asignacion-->
+                <ace:dialog header="#{trackingsCP.proceso.flujo.nombre}"
+                            closable="false"
+                            modal="true"
+                            draggable="true"
+                            showEffect="clip"
+                            hideEffect="fade"
+                            visible="#{trackingsCP.formularioAsignacion.mostrar}"
+                            rendered="#{trackingsCP.formularioAsignacion.mostrar}">
+                    <ace:tabSet style="clear: both"> 
+                        <!--                        Detalles: ingreso y mantenimiento-->
+                        <ace:tabPane label="Asignación">
+                            <h:panelGrid columns="2" width="100%">
+                                <h:outputText value="Observación:"/>
+                                <h:outputText value=""/>
+                                <h:inputTextarea value="#{trackingsCP.tracking.observaciones}" rows="4" cols="40"/>
+                                <h:outputText value=""/>
+                                <h:outputText value="Estado Siguiente"/>
+                                <h:outputText value=""/>
+                                <ice:selectOneMenu value="#{trackingsCP.proceso.flujo.siguiente}" partialSubmit="true">
+                                    <f:selectItems value="#{trackingsCP.getComboFlujos(trackingsCP.proceso.area)}"/>                            
+                                </ice:selectOneMenu>
+                                <h:outputText value=""/>
+                                <h:outputText value="Asignar:"/>
+                                <h:outputText value=""/>
+                                <h:outputText value="#{trackingsCP.proceso.flujo.siguiente.rol.nombre}"/> 
+                                <h:outputText value=""/>
+                                <ice:selectOneMenu value="#{trackingsCP.proceso.responsable}">
+                                    <f:selectItems value="#{trackingsCP.comboUsuarios}"/>
+                                </ice:selectOneMenu>
+                                <h:outputText value=""/>
+
+                                <h:outputText value=""/>
+<!--                                <ace:panel rendered="#{trackingsCP.controlModFecha(trackingsCP.proceso)}">
+                                    <h:outputText value=""/>
+                                    <h:outputText value="Fecha de Planificación:"/>
+                                    <h:outputText value=""/>
+                                    <ace:dateTimeEntry navigator="true" value="#{trackingsCP.proceso.fechaplanificacion}"   
+                                                       popupIcon="ui-icon ui-icon-calendar" renderAsPopup="true" 
+                                                       pattern="dd/MM/yyyy" label="dd/MM/yyyy" labelPosition="infield">
+                                    </ace:dateTimeEntry>
+                                </ace:panel>-->
+                            </h:panelGrid>
+                        </ace:tabPane>
+
+                        <!--                        Anexos: ingreso-->
+                        <ace:tabPane label="Documentos" >
+                            <h:panelGrid columns="3" rendered="#{trackingsCP.proceso.flujo.anexosmod}" >
+                                <ace:fileEntry 
+                                    relativePath="/files/"
+                                    maxFileCount="10"
+                                    maxFileCountMessage="Alerta se pueden Subir hasta 10 archivos."
+                                    fileEntryListener="#{imagenesCompras.ficheroDocumentoLista}"
+                                    maxFileSize="10242880"
+                                    maxFileSizeMessage="El Tamaño del Archivo Maximo 10 MB."
+                                    maxTotalSize="102428800"
+                                    maxTotalSizeMessage="EL Tamaño Total de Los Archivos Subídos es demasiado grande."
+                                    requiredMessage="El archivo/s es/son requeridos para enviar esta forma."
+                                    useOriginalFilename="true"
+                                    useSessionSubdir="true"
+                                    label="Archivo Subido con Éxito"
+                                    />
+                                <h:commandButton  type="submit" value="Subir Archivos"/>
+                            </h:panelGrid>
+                            <ace:dataTable value="#{imagenesCompras.listaDocumentos}" 
+                                           var="documentosol"
+                                           style="width: 99%;"
+                                           paginator="true"
+                                           paginatorAlwaysVisible="true"
+                                           paginatorPosition="both"
+                                           rowsPerPageTemplate="5,10"
+                                           currentPageReportTemplate="Documento {startRecord}/{totalRecords} Página {currentPage}/{totalPages}"
+                                           paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                           rows="10"
+                                           rowIndexVar="row"> 
+                                <ace:column style="text-align: left" headerText="Acciones" >                             
+                                    <ace:menuBar autoSubmenuDisplay="true" >
+                                        <ace:menuItem value="Borrar" icon="ui-icon ui-icon-trash" 
+                                                      action="#{imagenesCompras.borrarDocumento(documentosol)}" 
+                                                      helpText="Borrar" 
+                                                      disabled="#{trackingsCP.proceso.flujo.anexosmod and documentosol.id ne null}"
+                                                      />
+                                    </ace:menuBar>
+                                </ace:column>
+                                <ace:column headerText="Nombre Documento" style="text-align: left" >
+                                    <h:outputText value="#{documentosol.nombrearchivo}"/>
+                                </ace:column>
+                                <ace:column  headerText="Doc. Digital" style="text-align: left">
+                                    <h:commandLink value="Ver Documento"  action="#{imagenesCompras.traerImagen(documentosol.path, documentosol.nombrearchivo, documentosol.tipo)}" rendered="#{documentosol.path ne null}" />
+                                </ace:column>
+                            </ace:dataTable>
+                        </ace:tabPane>
+                        <!--                        Trackings Asignacion -->
+                        <ace:tabPane label="Trackings">
+                            <!--                            <ace:panel header="Resultado Búsqueda">-->
+                            <h:panelGrid columns="1" width="100%">
+                                <ace:dataTable 
+                                    value="#{trackingsCP.listaTrackings}" 
+                                    var="item"
+                                    paginatorAlwaysVisible="true"
+                                    lazy="false"
+                                    paginator="true"
+                                    resizableColumns="true"
+                                    rowIndexVar="row"
+                                    paginatorPosition="both"
+                                    rowsPerPageTemplate="10,15,50"
+                                    currentPageReportTemplate="{totalRecords} Tracking(s) encontrada(s). Página(s): {currentPage} de {totalPages}"
+                                    paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                    rows="5"
+                                    style="width: 100%;"
+                                    >
+                                    <ace:column headerText="Fecha" style="text-align: left">
+                                        <h:outputText value="#{item.fecha}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                        </h:outputText>
+                                    </ace:column>
+                                    <ace:column headerText="Proceso" style="text-align: left">
+                                        <h:outputText value="#{item.proceso.codigo}"/>                                     
+                                    </ace:column>
+                                    <ace:column headerText="Fecha Planificación" style="text-align: left">
+                                        <h:outputText value="#{item.fechaplanificacion}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                        </h:outputText>
+                                    </ace:column>
+                                    <ace:column headerText="Fecha Realización" style="text-align: left">
+                                        <h:outputText value="#{item.fecharealizacion}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                        </h:outputText>
+                                    </ace:column>
+                                    <ace:column headerText="Observaciones" style="text-align: left">
+                                        <h:outputText value="#{item.observaciones}"/>                                     
+                                    </ace:column>
+                                    <ace:column headerText="Autor" style="text-align: left">
+                                        <h:outputText value="#{item.responsable.toString()}"/>                                     
+                                    </ace:column>
+                                    <ace:column headerText="Rol" style="text-align: left">
+                                        <h:outputText value="#{item.proceso.responsable.rolsistema.nombre}"/>                                     
+                                    </ace:column>
+                                    <ace:column headerText="Estado Flujo" style="text-align: left">
+                                        <h:outputText value="#{item.flujo}"/>
+                                    </ace:column>
+                                </ace:dataTable>
+                            </h:panelGrid>
+                            <!--                            </ace:panel>-->
+                        </ace:tabPane> 
+                        <h:panelGrid columns="2">
+                            <ace:menuBar autoSubmenuDisplay="true">
+                                <ace:menuItem value="Salir"
+                                              action="#{anexos.formulario.cancelar()}"
+                                              icon="ui-icon ui-icon-close"/>
+                            </ace:menuBar>
+                            <ace:messages/>
+                        </h:panelGrid>
+
+                    </ace:tabSet>
+
+
+
+
+                    <!--                        Botones Asignacion -->
+                    <h:panelGrid columns="2">
+                        <ace:menuBar autoSubmenuDisplay="true">
+                            <ace:menuItem value="Grabar"
+                                          action="#{trackingsCP.grabarAsignacion()}"
+                                          icon="ui-icon ui-icon-disk"/>
+                            <ace:menuItem value="Salir"
+                                          action="#{trackingsCP.formularioAsignacion.cancelar()}"
+                                          icon="ui-icon ui-icon-close"/>
+                        </ace:menuBar>
+                        <ace:messages/>
+                    </h:panelGrid>
+                </ace:dialog>
+
+                <!--                        Descargar Anexos-->
+                <ace:dialog header="Descargar documento" modal="true" closable="false" 
+                            visible="#{anexos.formularioanexos.mostrar}" 
+                            rendered="#{anexos.formularioanexos.mostrar}" >
+                    <h:panelGrid columns="1" width="100%">
+
+                        <ace:messages/>
+                        <ice:outputText value="Documento:"/>
+                        <ice:outputText value="#{anexos.anexo.nombrearchivo}"/>
+                        <ice:outputResource fileName="#{anexos.nombrearchivo}" 
+                                            attachment="true" 
+                                            label="Descargar documento"
+                                            mimeType="application/pdf"
+                                            resource="#{anexos.imagenrs}" 
+                                            type="button"/>
+
+                        <ace:menuBar>
+
+                            <ace:menuItem value="Cerrar" icon="ui-icon ui-icon-close" 
+                                          action="#{anexos.formularioanexos.cancelar()}"/>
+                        </ace:menuBar>
+
+                    </h:panelGrid>
+                    <ace:messages/>
+                </ace:dialog>
+
+
+                <!--                        Historial-->
+                <ace:dialog header="Registro Historial"
+                            closable="false"
+                            modal="true"
+                            draggable="true"
+                            showEffect="clip"
+                            hideEffect="fade"
+                            visible="#{trackingsCP.formularioHistorial.mostrar}"
+                            rendered="#{trackingsCP.formularioHistorial.mostrar}">
+
+                    <!--                    <ace:tabSet style="clear: both">  -->
+                    <!--                        Historial: presentacion-->
+
+                    <!--                        Trackings: ingreso y mantenimiento-->
+                    <!--                        <ace:tabPane label="Detalles Trackings">-->
+                    <!--                            <ace:panel header="Resultado Búsqueda">-->
+                    <h:panelGrid columns="1" width="100%">
+                        <ace:dataTable 
+                            value="#{trackingsCP.listaTrackings}" 
+                            var="item"
+                            paginatorAlwaysVisible="true"
+                            lazy="false"
+                            paginator="true"
+                            resizableColumns="true"
+                            rowIndexVar="row"
+                            paginatorPosition="both"
+                            rowsPerPageTemplate="10,15,50"
+                            currentPageReportTemplate="{totalRecords} Tracking(s) encontrada(s). Página(s): {currentPage} de {totalPages}"
+                            paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                            rows="5"
+                            style="width: 100%;"
+                            >
+                            <ace:column headerText="Fecha" style="text-align: left">
+                                <h:outputText value="#{item.fecha}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:outputText>
+                            </ace:column>
+                            <ace:column headerText="Proceso" style="text-align: left">
+                                <h:outputText value="#{item.proceso.codigo}"/>                                     
+                            </ace:column>
+
+                            <ace:column headerText="Fecha Planificación" style="text-align: left">
+                                <h:outputText value="#{item.fechaplanificacion}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:outputText>
+                            </ace:column>
+                            <ace:column headerText="Fecha Realización" style="text-align: left">
+                                <h:outputText value="#{item.fecharealizacion}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:outputText>
+                            </ace:column>
+                            <ace:column headerText="Observaciones" style="text-align: left">
+                                <h:outputText value="#{item.observaciones}"/>                                     
+                            </ace:column>
+                            <ace:column headerText="Autor" style="text-align: left">
+                                <h:outputText value="#{item.responsable.toString()}"/>                                     
+                            </ace:column>
+                            <ace:column headerText="Rol" style="text-align: left">
+                                <h:outputText value="#{item.proceso.responsable.rolsistema.nombre}"/>                                     
+                            </ace:column>
+                            <ace:column headerText="Estado Flujo" style="text-align: left">
+                                <h:outputText value="#{item.flujo}"/>
+                            </ace:column>                                        
+                        </ace:dataTable>
+                    </h:panelGrid>
+                    <!--                            </ace:panel>-->
+                    <!--                        </ace:tabPane>-->
+                    <!--                    </ace:tabSet>-->
+                    <!--                        Botones Tracking -->
+                    <h:panelGrid columns="2">
+                        <ace:menuBar autoSubmenuDisplay="true">
+                            <ace:menuItem value="Salir"
+                                          action="#{trackingsCP.formularioHistorial.cancelar()}"
+                                          icon="ui-icon ui-icon-close"/>
+                        </ace:menuBar>
+                        <ace:messages/>
+                    </h:panelGrid>
+                </ace:dialog>
+                <!--                        Registro Respuesta-->
+                <ace:dialog header="Registrar Respuesta"
+                            closable="false"
+                            modal="true"
+                            draggable="true"
+                            showEffect="clip"
+                            hideEffect="fade"
+                            visible="#{trackingsCP.formularioRespuesta.mostrar}"
+                            rendered="#{trackingsCP.formularioRespuesta.mostrar}">
+                    <ace:tabSet style="clear: both"> 
+                        <!--                        ingreso respuesta-->
+                        <ace:tabPane label="Respuesta">
+                            <h:panelGrid columns="2" width="100%">
+                                <h:outputText value="Proceso :"/>
+                                <h:outputText value="#{trackingsCP.proceso.codigo}"/> 
+                                <h:outputText value="Nro. Oficio :"/>
+                                <h:inputText value="#{trackingsCP.respuesta.nombreoficio}"/> 
+<!--                                <h:panelGrid columns="2" >-->
+                                    <ace:fileEntry 
+                                        relativePath="/files/"
+                                        maxFileCount="10"
+                                        maxFileCountMessage="Alerta se pueden Subir hasta 10 archivos."
+                                        fileEntryListener="#{imagenesCompras.ficheroDocumentoLista}"
+                                        maxFileSize="10242880"
+                                        maxFileSizeMessage="El Tamaño del Archivo Maximo 10 MB."
+                                        maxTotalSize="102428800"
+                                        maxTotalSizeMessage="EL Tamaño Total de Los Archivos Subídos es demasiado grande."
+                                        requiredMessage="El archivo/s es/son requeridos para enviar esta forma."
+                                        useOriginalFilename="true"
+                                        useSessionSubdir="true"
+                                        label="Archivo Subido con Éxito"
+                                        />
+                                    <h:commandButton  type="submit" value="Subir Archivos"/>
+<!--                                </h:panelGrid>-->
+                                <ace:dataTable value="#{imagenesCompras.listaDocumentos}" 
+                                               var="documentores"
+                                               style="width: 99%;"
+                                               paginator="true"
+                                               paginatorAlwaysVisible="true"
+                                               paginatorPosition="both"
+                                               rowsPerPageTemplate="5,10"
+                                               currentPageReportTemplate="Documento {startRecord}/{totalRecords} Página {currentPage}/{totalPages}"
+                                               paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                               rows="10"
+                                               rowIndexVar="row"> 
+                                    <ace:column style="text-align: left" headerText="Acciones">                             
+                                        <ace:menuBar autoSubmenuDisplay="true" >
+                                            <ace:menuItem value="Borrar" icon="ui-icon ui-icon-trash" 
+                                                          action="#{imagenesCompras.borrarDocumento(documentores)}" 
+                                                          helpText="Borrar" 
+                                                          />
+                                        </ace:menuBar>
+                                    </ace:column>
+                                    <ace:column headerText="Nombre Documento" style="text-align: left" >
+                                        <h:outputText value="#{documentores.nombrearchivo}"/>
+                                    </ace:column>
+                                    <ace:column  headerText="Doc. Digital" style="text-align: left">
+                                        <h:commandLink value="Ver Documento"  action="#{imagenesCompras.traerImagen(documentores.path, documentores.nombrearchivo, documentores.tipo)}" rendered="#{documentores.path ne null}" />
+                                    </ace:column>
+                                </ace:dataTable>
+                            </h:panelGrid>
+                        </ace:tabPane>
+                        <!--                        Trackings Respuesta -->
+                        <ace:tabPane label="Trackings">
+                            <!--                            <ace:panel header="Resultado Búsqueda">-->
+                            <h:panelGrid columns="1" width="100%">
+                                <ace:dataTable 
+                                    value="#{trackingsCP.listaTrackings}" 
+                                    var="item"
+                                    paginatorAlwaysVisible="true"
+                                    lazy="false"
+                                    paginator="true"
+                                    resizableColumns="true"
+                                    rowIndexVar="row"
+                                    paginatorPosition="both"
+                                    rowsPerPageTemplate="10,15,50"
+                                    currentPageReportTemplate="{totalRecords} Tracking(s) encontrada(s). Página(s): {currentPage} de {totalPages}"
+                                    paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                    rows="5"
+                                    style="width: 100%;"
+                                    >
+                                    <ace:column headerText="Fecha" style="text-align: left">
+                                        <h:outputText value="#{item.fecha}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                        </h:outputText>
+                                    </ace:column>
+                                    <ace:column headerText="Proceso" style="text-align: left">
+                                        <h:outputText value="#{item.proceso.toString()}"/>                                     
+                                    </ace:column>
+
+                                    <ace:column headerText="Fecha Planificación" style="text-align: left">
+                                        <h:outputText value="#{item.fechaplanificacion}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                        </h:outputText>
+                                    </ace:column>
+                                    <ace:column headerText="Fecha Realización" style="text-align: left">
+                                        <h:outputText value="#{item.fecharealizacion}">
+                                            <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                        </h:outputText>
+                                    </ace:column>
+                                    <ace:column headerText="Observaciones" style="text-align: left">
+                                        <h:outputText value="#{item.observaciones}"/>                                     
+                                    </ace:column>
+                                    <ace:column headerText="Autor" style="text-align: left">
+                                        <h:outputText value="#{item.responsable.toString()}"/>                                     
+                                    </ace:column>
+                                    <ace:column headerText="Rol" style="text-align: left">
+                                        <h:outputText value="#{item.proceso.responsable.rolsistema.nombre}"/>                                     
+                                    </ace:column>
+                                    <ace:column headerText="Estado Flujo" style="text-align: left">
+                                        <h:outputText value="#{item.flujo}"/>
+                                    </ace:column>
+                                </ace:dataTable>
+                            </h:panelGrid>
+                            <!--                            </ace:panel>-->
+                        </ace:tabPane>
+                    </ace:tabSet>
+                    <!--                        Botones Respuesta -->
+                    <h:panelGrid columns="2">
+                        <ace:menuBar autoSubmenuDisplay="true">
+                            <ace:menuItem value="Grabar"
+                                          action="#{trackingsCP.grabarRespuesta()}"
+                                          icon="ui-icon ui-icon-disk"/>
+                            <ace:menuItem value="Salir"
+                                          action="#{trackingsCP.formularioRespuesta.cancelar()}"
+                                          icon="ui-icon ui-icon-close"/>
+                        </ace:menuBar>
+                        <ace:messages/>
+                    </h:panelGrid>
+                </ace:dialog>
+                <ui:include src="../sistema/DescargarDocumentos.xhtml"/>
+            </ui:define>
+            <!-- Fin -->
+        </ui:composition>
+    </h:body>
+</html>

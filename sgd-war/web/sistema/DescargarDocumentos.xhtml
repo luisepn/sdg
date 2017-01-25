@@ -1,0 +1,47 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ace="http://www.icefaces.org/icefaces/components"
+      xmlns:ice="http://www.icesoft.com/icefaces/component">
+    <ace:dialog                       
+        header="Borrar Archivo"
+        closable="false"
+        modal="true"
+        draggable="false"
+        rendered="#{imagenesCompras.formulario.borrar}"
+        visible="#{imagenesCompras.formulario.borrar}"
+        zindex="1350">
+        <ice:panelGrid columns="1" >
+            <h:outputText value="¿Está seguro de eliminar el archivo seleccionado?" style="text-align: center;"/>
+        </ice:panelGrid>
+        <ace:menuBar autoSubmenuDisplay="true"  >
+            <ace:menuItem value="Borrar" 
+                          icon="ui-icon ui-icon-trash" 
+                          action="#{imagenesCompras.eliminarDocumento()}"/>
+            <ace:menuItem value="Cancelar" 
+                          icon="ui-icon ui-icon-close" 
+                          action="#{imagenesCompras.formulario.cancelar()}"/>
+        </ace:menuBar>
+    </ace:dialog>
+    <ace:dialog header="Descargar archivo" modal="true" closable="false" 
+                visible="#{imagenesCompras.formulario.nuevo}" 
+                draggable="false"
+                rendered="#{imagenesCompras.formulario.nuevo}" >
+        <h:panelGrid columns="1" width="100%">
+            <!--<ace:messages/>-->
+            <ice:outputResource 
+                fileName="#{imagenesCompras.nombreArchivo}"                                            
+                attachment="true"                                             
+                label="Descargar archivo"
+                mimeType="#{imagenesCompras.tipoArchivo}"
+                resource="#{imagenesCompras.recurso}" 
+                type="button"/>
+            <ace:menuBar>
+                <ace:menuItem value="Cerrar" icon="ui-icon ui-icon-close" 
+                              action="#{imagenesCompras.formulario.cancelar()}"/>
+            </ace:menuBar>
+        </h:panelGrid>
+    </ace:dialog>
+</html>
+

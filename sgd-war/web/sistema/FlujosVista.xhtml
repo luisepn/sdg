@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ace="http://www.icefaces.org/icefaces/components"
+      xmlns:ice="http://www.icesoft.com/icefaces/component">
+    <h:head>
+    </h:head>
+    <h:body >
+        <ui:composition template="../plantillas/plantilla.xhtml">
+            <!-- Aqui va todo el codigo de la pagina -->
+            <ui:define name="content">
+                <ace:panel header="Flujos">
+                    <h:panelGrid columns="2">
+                        <h:outputLabel value="Procedimiento :"/>
+                        <ice:selectOneMenu value="#{flujosCP.area}"  style="width: 300px;">
+                            <f:selectItems value="#{areasCP.comboareas}"/>                            
+                        </ice:selectOneMenu>
+                        <ace:menuBar autoSubmenuDisplay="true" >
+                            <ace:menuItem value="Nuevo" 
+                                          icon="ui-icon ui-icon-document" 
+                                          action="#{flujosCP.nuevo()}"/>
+                            <ace:menuItem value="Buscar"
+                                          icon="ui-icon ui-icon-search"  
+                                          action="#{flujosCP.buscar()}"/>
+                        </ace:menuBar>
+
+                        <ace:messages/>
+                    </h:panelGrid>
+                </ace:panel>
+                <ace:panel header="Resultado Búsqueda">
+                    <h:panelGrid columns="1" width="100%">
+                        <ace:dataTable value="#{flujosCP.listaFlujos}" 
+                                       var="item"
+                                       paginatorAlwaysVisible="true"
+                                       paginator="true"
+                                       resizableColumns="true"
+                                       lazy="false"
+                                       rowIndexVar="row"
+                                       paginatorPosition="both"
+                                       rowsPerPageTemplate="10,15,50"
+                                       currentPageReportTemplate="{totalRecords} Estado(s) encontrado(s). Página(s): {currentPage} de {totalPages}"
+                                       paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                       rows="10"
+                                       style="width: 100%;" 
+                                       binding="#{flujosCP.formulario.fila}" >
+                            <ace:row condition="group" groupBy="#{item.area}" pos="before" styleClass="grupo">
+                                <ace:column style="text-align: center;" colspan="10">
+                                    <h:outputText value="#{item.area.nombre}" />
+                                </ace:column>
+                            </ace:row>  
+                            <ace:column headerText="Acciones" style="text-align: left">
+                                <ace:menuButton id="menuButton" effect="slide" effectDuration="200" value="..." >
+                                    <ace:menuItem action="#{flujosCP.modificar()}" value="Editar" icon="ui-icon ui-icon-pencil"/>
+                                    <ace:menuItem action="#{flujosCP.eliminar()}" value="Borrar" icon="ui-icon ui-icon-trash"/>
+                                </ace:menuButton>
+                            </ace:column>
+                            <ace:column headerText="Nro" style="text-align: left" >
+                                <h:outputText value="#{item.nro}"/>
+                            </ace:column>
+                            <ace:column headerText="Nombre" style="text-align: left" >
+                                <h:outputText value="#{item.nombre}"/>
+                            </ace:column>
+                            <ace:column headerText="Nro. Días para ejecución" style="text-align: left" >
+                                <h:outputText value="#{item.diasrecordatorio}"/>
+                            </ace:column>
+<!--                            <ace:column headerText="Permitir Modificación de Fecha de Planificación:" style="text-align: left">
+                                <ice:graphicImage url="../resources/imagenes/si.png" rendered="#{item.fechamod}"/>
+                                <ice:graphicImage url="../resources/imagenes/no.png" rendered="#{!item.fechamod}"/>
+                            </ace:column>-->
+                            <ace:column headerText="Permitir Incorporar Anexos:" style="text-align: left">
+                                <ice:graphicImage url="../resources/css/images/si.png" rendered="#{item.anexosmod}"/>
+                                <ice:graphicImage url="../resources/css/images/no.png" rendered="#{!item.anexosmod}"/>
+                            </ace:column>
+                            <ace:column headerText="Rol Ejecutor:" style="text-align: left">
+                                <h:outputText value="#{item.rol.nombre}"/>
+                            </ace:column>                            
+                            <ace:column headerText="Estado Previo:" style="text-align: left">
+                                <h:outputText value="#{item.anterior.nombre}"/>
+                            </ace:column>                            
+                            <ace:column headerText="Estado Siguiente:" style="text-align: left">
+                                <h:outputText value="#{item.siguiente.nombre}"/>
+                            </ace:column>
+                            <ace:column headerText="Descripción" style="text-align: left">
+                                <h:outputText value="#{item.detalle}"/>
+                            </ace:column> 
+                        </ace:dataTable> 
+                    </h:panelGrid>
+                </ace:panel>
+
+                <ace:dialog 
+                    header="Flujo" 
+                    closable="false"
+                    modal="true"
+                    draggable="true"
+                    showEffect="clip"
+                    hideEffect="fade" 
+                    visible="#{flujosCP.formulario.mostrar}" 
+                    rendered="#{flujosCP.formulario.mostrar}">
+                    <h:panelGrid columns="2" width="100%">
+                        <h:outputText value="Nro"/>
+                        <h:inputText value="#{flujosCP.flujo.nro}"/>
+                        <h:outputText value="Nombre"/>
+                        <h:inputText value="#{flujosCP.flujo.nombre}"/>
+                        <h:outputText value="Nro. Días para ejecución"/>
+                        <h:inputText value="#{flujosCP.flujo.diasrecordatorio}"/>
+<!--                        <h:outputText value="Permitir Modificación de Fecha de Planificación:"/>
+                        <h:selectBooleanCheckbox value="#{flujosCP.flujo.fechamod}"/>-->
+                        <h:outputText value="Permitir Incorporar Anexos:"/>
+                        <h:selectBooleanCheckbox value="#{flujosCP.flujo.anexosmod}"/>
+                        <h:outputLabel value="Rol del Ejecutor:"/>
+                        <ice:selectOneMenu value="#{flujosCP.flujo.rol}"  style="width: 300px;">
+                            <f:selectItems value="#{rolesCP.comboroles}"/>                            
+                        </ice:selectOneMenu>
+                        <h:outputLabel value="Estado Anterior:"/>
+                        <ice:selectOneMenu value="#{flujosCP.flujo.anterior}"  style="width: 300px;">
+                            <f:selectItems value="#{flujosCP.comboflujosArea}"/>                            
+                        </ice:selectOneMenu>
+                        <h:outputLabel value="Estado Siguiente:"/>
+                        <ice:selectOneMenu value="#{flujosCP.flujo.siguiente}"  style="width: 300px;">
+                            <f:selectItems value="#{flujosCP.comboflujosArea}"/>                            
+                        </ice:selectOneMenu>
+                        <h:outputText value="Descripción"/>
+                        <h:inputTextarea value="#{flujosCP.flujo.detalle}"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <ace:menuBar autoSubmenuDisplay="true" >
+                            <ace:menuItem value="Grabar" icon="ui-icon ui-icon-disk" 
+                                          rendered="#{flujosCP.formulario.nuevo}" 
+                                          action="#{flujosCP.insertar()}"/>
+                            <ace:menuItem value="Grabar" icon="ui-icon ui-icon-disk" 
+                                          action="#{flujosCP.grabar()}" 
+                                          rendered="#{flujosCP.formulario.modificar}" />
+                            <ace:menuItem action="#{flujosCP.borrar()}" 
+                                          value="¿Está seguro de Borrar el registro?" 
+                                          icon="ui-icon ui-icon-trash" 
+                                          rendered="#{flujosCP.formulario.borrar}"/>
+                            <ace:menuItem value="Salir" icon="ui-icon ui-icon-close" 
+                                          action="#{flujosCP.formulario.cancelar()}"/>
+                        </ace:menuBar>
+                        <ace:messages/>
+                    </h:panelGrid>
+                </ace:dialog>
+            </ui:define>
+            <!-- Fin -->
+        </ui:composition>
+    </h:body>
+</html>

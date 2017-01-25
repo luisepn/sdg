@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ace="http://www.icefaces.org/icefaces/components"
+      xmlns:ice="http://www.icesoft.com/icefaces/component">
+    <h:head>
+    </h:head>
+    <h:body>
+        <ui:composition template="../plantillas/plantilla.xhtml">
+
+            <!-- Aqui va todo el codigo de la pagina -->
+            <ui:define name="content">
+                <ace:panel header="Ingreso de Procesos">
+                    <ace:panel header="Criterios de Búsqueda">
+                        <h:panelGrid columns="8">
+                            <h:outputLabel value="Año : "/>
+                            <h:inputText value="#{procesosCP.anio}"/>
+                            <h:outputLabel value="Código"/>
+                            <h:inputText value="#{procesosCP.codigo}"/>
+                            <h:outputLabel value="Medio de Ingreso:"/>
+                            <h:inputText value="#{procesosCP.tipoingreso}" />
+                            <h:outputLabel value="Procedimiento:"/>
+                            <ice:selectOneMenu value="#{procesosCP.areabuscar}"  style="width: 300px;">
+                                <f:selectItems value="#{areasCP.comboareas}"/>                            
+                            </ice:selectOneMenu>
+                            <h:outputLabel value="Descripción"/>
+                            <h:inputText value="#{procesosCP.descripcion}" />
+                        </h:panelGrid>
+                        <h:panelGrid columns="2">
+                            <ace:menuBar autoSubmenuDisplay="true">
+                                <ace:menuItem value="Nuevo" 
+                                              icon="ui-icon ui-icon-document"      
+                                              action="#{procesosCP.nuevo()}" rendered="#{!procesosCP.controlInsertar()}"/>
+                                <ace:menuItem value="Buscar" 
+                                              icon="ui-icon ui-icon-search"
+                                              action="#{procesosCP.buscar()}"/>
+
+                            </ace:menuBar>
+                        </h:panelGrid>
+                        <ace:messages/>
+                    </ace:panel>
+
+                    <ace:panel header="Resultado Búsqueda">
+                        <h:panelGrid columns="1" width="100%">
+                            <ace:dataTable 
+                                value="#{procesosCP.listaProcesos}" 
+                                var="item"
+                                paginatorAlwaysVisible="true"
+                                lazy="true"
+                                paginator="true"
+                                resizableColumns="true"
+                                rowIndexVar="row"
+                                paginatorPosition="both"
+                                rowsPerPageTemplate="10,15,50"
+                                currentPageReportTemplate="{totalRecords} Proceso (s) encontrado(s). Página(s): {currentPage} de {totalPages}"
+                                paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                rows="10"
+                                style="width: 100%;"
+                                >
+                                <ace:column headerText="Acciones" style="text-align: left">
+                                    <ace:menuButton id="menuButton" effect="slide" effectDuration="200" value="..." >
+                                        <ace:menuItem action="#{procesosCP.modificar()}" value="Editar" icon="ui-icon ui-icon-pencil"/>
+                                        <ace:menuItem action="#{trackingsCP.historiar(item)}" value="Historial" icon="ui-icon ui-icon-script"/>
+                                        <ace:menuItem action="#{procesosCP.traerRespuesta(item)}" value="Respuesta" icon="ui-icon ui-icon-mail-open" rendered="#{procesosCP.controlVerDocumento(item)}"/>
+                                    </ace:menuButton>
+                                </ace:column>
+                                <ace:column headerText="Fecha Ingreso" style="text-align: left">
+                                    <h:outputText value="#{item.fechaingreso}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                                    </h:outputText>
+                                </ace:column>
+                                <ace:column headerText="Fecha Inicio" style="text-align: left" >
+                                    <h:outputText value="#{item.fechainicio}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </h:outputText>
+                                </ace:column>
+                                <ace:column headerText="Fecha Fin" style="text-align: left" >
+                                    <h:outputText value="#{item.fechafin}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </h:outputText>
+                                </ace:column>
+                                <ace:column headerText="Código" style="text-align: left">
+                                    <h:outputText value="#{item.codigo}"/>                                     
+                                </ace:column>
+                                <ace:column headerText="Medio de Ingreso" style="text-align: left">
+                                    <h:outputText value="#{item.tipoingreso}"/>
+                                </ace:column>
+                                <ace:column headerText="Área" style="text-align: left">
+                                    <h:outputText value="#{item.area.nombre}"/>
+                                </ace:column>
+                                <ace:column headerText="Descripción" style="text-align: left">
+                                    <h:outputText value="#{item.descripcion}"/>
+                                </ace:column>
+                                <ace:column headerText="Flujo" style="text-align: left">
+                                    <h:outputText value="#{item.flujo.nombre}"/>
+                                </ace:column>
+                                <ace:column headerText="Fecha Planificación" style="text-align: left" >
+                                    <h:outputText value="#{item.fechaplanificacion}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </h:outputText>
+                                </ace:column>
+                                <ace:column headerText="Fecha Asignación" style="text-align: left" >
+                                    <h:outputText value="#{item.fechaasignacion}">
+                                        <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                    </h:outputText>
+                                </ace:column>
+                                <ace:column headerText="Rol Responsable" style="text-align: left">
+                                    <h:outputText value="#{item.flujo.rol.nombre}"/>
+                                </ace:column>
+                                <ace:column headerText="Responsable" style="text-align: left">
+                                    <h:outputText value="#{item.responsable.toString()}"/>
+                                </ace:column>
+                            </ace:dataTable>
+                        </h:panelGrid>
+                    </ace:panel>
+                </ace:panel>
+
+                <ace:dialog header="Registro Proceso"
+                            closable="false"
+                            modal="true"
+                            draggable="true"
+                            showEffect="clip"
+                            hideEffect="fade"
+                            visible="#{procesosCP.formulario.mostrar}"
+                            rendered="#{procesosCP.formulario.mostrar}">
+
+                    <ace:tabSet style="clear: both">  
+                        <ace:tabPane label="Detalles Proceso">
+
+                            <h:panelGrid columns="2">
+                                <h:outputText value="Año"/>
+                                <h:outputText value="#{procesosCP.proceso.anio}"/>
+                                <h:outputText value="Procedimiento"/>
+                                <h:outputText value="#{procesosCP.proceso.area.nombre}"/>
+                                <h:outputText value="Código"/>
+                                <h:inputText value="#{procesosCP.proceso.codigo}" disabled="#{procesosCP.formulario.modificar or procesosCP.formulario.nuevo}"/>
+
+                                <h:outputText value="Medio de Ingreso"/>
+                                <ice:selectOneMenu value="#{procesosCP.proceso.tipoingreso}">
+                                    <f:selectItem itemLabel="Correo" itemValue="Correo"/>                            
+                                    <f:selectItem itemLabel="Oficio" itemValue="Oficio"/>                            
+                                    <f:selectItem itemLabel="Otro" itemValue="Otro"/>                                                        
+                                </ice:selectOneMenu>
+                            </h:panelGrid>
+                            <h:panelGrid columns="2">
+                                <h:outputText value="Descripción"/>
+                                <h:inputTextarea value="#{procesosCP.proceso.descripcion}" style="width: 100%" cols="30" rows="15" />
+                            </h:panelGrid>
+                        </ace:tabPane>
+                        <!--                        DOCUMENTOS -->
+                        <ace:tabPane label="Documentos">
+                            <h:panelGrid columns="3" >
+                                <ace:fileEntry 
+                                    relativePath="/files/"
+                                    maxFileCount="10"
+                                    maxFileCountMessage="Alerta se pueden Subir hasta 10 archivos."
+                                    fileEntryListener="#{imagenesCompras.ficheroDocumentoLista}"
+                                    maxFileSize="10242880"
+                                    maxFileSizeMessage="El Tamaño del Archivo Maximo 10 MB."
+                                    maxTotalSize="102428800"
+                                    maxTotalSizeMessage="EL Tamaño Total de Los Archivos Subídos es demasiado grande."
+                                    requiredMessage="El archivo/s es/son requeridos para enviar esta forma."
+                                    useOriginalFilename="true"
+                                    useSessionSubdir="true"
+                                    label="Archivo Subido con Éxito"
+                                    />
+                                <h:commandButton  type="submit" value="Subir Archivos"/>
+                            </h:panelGrid>
+                            <ace:dataTable value="#{imagenesCompras.listaDocumentos}" 
+                                           var="documentosol"
+                                           style="width: 99%;"
+                                           paginator="true"
+                                           paginatorAlwaysVisible="true"
+                                           paginatorPosition="both"
+                                           rowsPerPageTemplate="5,10"
+                                           currentPageReportTemplate="Documento {startRecord}/{totalRecords} Página {currentPage}/{totalPages}"
+                                           paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                           rows="10"
+                                           rowIndexVar="row"> 
+                                <ace:column style="text-align: left" headerText="Acciones">                             
+                                    <ace:menuBar autoSubmenuDisplay="true" >
+                                        <ace:menuItem value="Borrar" icon="ui-icon ui-icon-trash" 
+                                                      action="#{imagenesCompras.borrarDocumento(documentosol)}" 
+                                                      helpText="Borrar" 
+                                                      />
+                                    </ace:menuBar>
+                                </ace:column>
+                                <ace:column headerText="Nombre Documento" style="text-align: left" >
+                                    <h:outputText value="#{documentosol.nombrearchivo}"/>
+                                </ace:column>
+                                <ace:column  headerText="Doc. Digital" style="text-align: left">
+                                    <h:commandLink value="Ver Documento"  action="#{imagenesCompras.traerImagen(documentosol.path, documentosol.nombrearchivo, documentosol.tipo)}" rendered="#{documentosol.path ne null}" />
+                                </ace:column>
+                            </ace:dataTable>
+                        </ace:tabPane>
+                    </ace:tabSet>
+                    <h:panelGrid columns="2">
+                        <ace:menuBar autoSubmenuDisplay="true">
+                            <ace:menuItem value="Grabar"
+                                          action="#{procesosCP.insertar()}"
+                                          rendered="#{procesosCP.formulario.nuevo}"
+                                          icon="ui-icon ui-icon-disk"/>
+                            <ace:menuItem value="Grabar"
+                                          action="#{procesosCP.grabar()}"
+                                          rendered="#{procesosCP.formulario.modificar}"
+                                          icon="ui-icon ui-icon-disk"/>
+                            <ace:menuItem value="¿Está seguro de Borrar el registro?"
+                                          action="#{procesosCP.borrar()}"
+                                          rendered="#{procesosCP.formulario.borrar}"
+                                          icon="ui-icon ui-icon-disk"/>
+                            <ace:menuItem value="Salir"
+                                          action="#{procesosCP.formulario.cancelar()}"
+                                          icon="ui-icon ui-icon-close"/>
+                        </ace:menuBar>
+                        <ace:messages/>
+                    </h:panelGrid>
+
+                </ace:dialog>
+
+                <!--                        Historial-->
+                <ace:dialog header="Historial"
+                            closable="false"
+                            modal="true"
+                            draggable="true"
+                            showEffect="clip"
+                            hideEffect="fade"
+                            visible="#{trackingsCP.formularioHistorial.mostrar}"
+                            rendered="#{trackingsCP.formularioHistorial.mostrar}">
+                    <h:panelGrid columns="1" width="100%">
+                        <ace:dataTable 
+                            value="#{trackingsCP.listaTrackings}" 
+                            var="item"
+                            paginatorAlwaysVisible="true"
+                            lazy="false"
+                            paginator="true"
+                            resizableColumns="true"
+                            rowIndexVar="row"
+                            paginatorPosition="both"
+                            rowsPerPageTemplate="10,15,50"
+                            currentPageReportTemplate="{totalRecords} Tracking(s) encontrado(s). Página(s): {currentPage} de {totalPages}"
+                            paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                            rows="5"
+                            style="width: 100%;"
+                            >
+                            <ace:column headerText="Fecha" style="text-align: left">
+                                <h:outputText value="#{item.fecha}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy HH:mm"/>
+                                </h:outputText>
+                            </ace:column>
+                            <ace:column headerText="Proceso" style="text-align: left">
+                                <h:outputText value="#{item.proceso.codigo}"/>                                     
+                            </ace:column>
+
+                            <ace:column headerText="Fecha Planificación" style="text-align: left">
+                                <h:outputText value="#{item.fechaplanificacion}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy  HH:mm"/>
+                                </h:outputText>
+                            </ace:column>
+                            <ace:column headerText="Fecha Realización" style="text-align: left">
+                                <h:outputText value="#{item.fecharealizacion}">
+                                    <f:convertDateTime pattern="dd/MM/yyyy  HH:mm"/>
+                                </h:outputText>
+                            </ace:column>
+                            <ace:column headerText="Observaciones" style="text-align: left">
+                                <h:outputText value="#{item.observaciones}"/>                                     
+                            </ace:column>
+                            <ace:column headerText="Responsable" style="text-align: left">
+                                <h:outputText value="#{item.responsable.toString()}"/>                                     
+                            </ace:column>
+                            <ace:column headerText="Rol" style="text-align: left">
+                                <h:outputText value="#{item.proceso.responsable.rolsistema.nombre}"/>                                     
+                            </ace:column>
+                            <ace:column headerText="Estado Flujo" style="text-align: left">
+                                <h:outputText value="#{item.flujo}"/>
+                            </ace:column>
+                        </ace:dataTable>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <ace:menuBar autoSubmenuDisplay="true">
+                            <ace:menuItem value="Salir"
+                                          action="#{trackingsCP.formularioHistorial.cancelar()}"
+                                          icon="ui-icon ui-icon-close"/>
+                        </ace:menuBar>
+
+                    </h:panelGrid>
+                </ace:dialog>
+
+
+                <!--                RESPUESTA-->
+                <ace:dialog header="Respuesta"
+                            closable="false"
+                            modal="true"
+                            draggable="true"
+                            showEffect="clip"
+                            hideEffect="fade"
+                            visible="#{procesosCP.formularioRespuesta.mostrar}"
+                            rendered="#{procesosCP.formularioRespuesta.mostrar}">
+                    <!--                        ingreso respuesta-->
+                    <h:panelGrid columns="2" width="100%">
+                        <h:outputText value="Proceso :"/>
+                        <h:outputText value="#{procesosCP.respuesta.proceso.codigo}"/> 
+                        <h:outputText value="Nro. Oficio :"/>
+                        <h:inputText value="#{procesosCP.respuesta.nombreoficio}"/> 
+
+                    </h:panelGrid>  
+                    <h:panelGrid width="100%">
+                        <ace:dataTable value="#{imagenesCompras.listaDocumentosR}" 
+                                       var="documentores"
+                                       style="width: 99%;"
+                                       paginator="true"
+                                       paginatorAlwaysVisible="true"
+                                       paginatorPosition="both"
+                                       rowsPerPageTemplate="5,10"
+                                       currentPageReportTemplate="Documento {startRecord}/{totalRecords} Página {currentPage}/{totalPages}"
+                                       paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                       rows="10"
+                                       rowIndexVar="row"> 
+                            <ace:column headerText="Nombre Documento" style="text-align: left" >
+                                <h:outputText value="#{documentores.nombrearchivo}"/>
+                            </ace:column>
+                            <ace:column  headerText="Doc. Digital" style="text-align: left">
+                                <h:commandLink value="Ver Documento"  action="#{imagenesCompras.traerImagen(documentores.path, documentores.nombrearchivo, documentores.tipo)}" rendered="#{documentores.path ne null}" />
+                            </ace:column>
+                        </ace:dataTable>
+                    </h:panelGrid>
+                    <!--                        Botones Respuesta -->
+                    <h:panelGrid columns="2">
+                        <ace:menuBar autoSubmenuDisplay="true">
+                            <ace:menuItem value="Salir"
+                                          action="#{procesosCP.formularioRespuesta.cancelar()}"
+                                          icon="ui-icon ui-icon-close"/>
+                        </ace:menuBar>
+                        <ace:messages/>
+                    </h:panelGrid>
+                </ace:dialog>
+
+
+                <ui:include src="../sistema/DescargarDocumentos.xhtml"/>
+            </ui:define>
+            <!-- Fin -->
+        </ui:composition>
+    </h:body>
+</html>

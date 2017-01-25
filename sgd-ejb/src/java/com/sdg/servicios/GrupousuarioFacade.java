@@ -12,11 +12,11 @@ import javax.persistence.PersistenceContext;
 
 /**
  *
- * @author limon
+ * @author luis
  */
 @Stateless
 public class GrupousuarioFacade extends AbstractFacade<Grupousuario> {
-    @PersistenceContext(unitName = "sinvent-ejbPU")
+    @PersistenceContext(unitName = "sgd-ejbPU")
     private EntityManager em;
 
     @Override

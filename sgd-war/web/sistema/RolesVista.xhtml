@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this template, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ace="http://www.icefaces.org/icefaces/components"
+      >
+    <h:head>
+
+    </h:head>
+    <h:body>
+
+        <ui:composition template="../plantillas/plantilla.xhtml">
+            <!-- Aqui va todo el codigo de la pagina -->
+            <ui:define name="content">
+                <ace:panel header="Roles de Usuarios">
+                    <h:panelGrid columns="2">
+                        <ace:menuBar autoSubmenuDisplay="true" >
+                            <ace:menuItem value="Nuevo" 
+                                          icon="ui-icon ui-icon-document" 
+                                          action="#{rolesCP.nuevo()}"/>
+                            <ace:menuItem value="Buscar"
+                                          icon="ui-icon ui-icon-search"  
+                                          action="#{rolesCP.buscar()}"/>
+                        </ace:menuBar>
+                        <ace:messages/>
+                    </h:panelGrid>
+                </ace:panel>
+
+                <ace:panel header="Resultado Búsqueda">
+                    <h:panelGrid columns="1" width="100%">
+                        <ace:dataTable value="#{rolesCP.listaRoles}" var="item"
+                                       paginatorAlwaysVisible="true"
+                                       paginator="true"
+                                       resizableColumns="true"
+                                       lazy="false"
+                                       rowIndexVar="row"
+                                       paginatorPosition="both"
+                                       rowsPerPageTemplate="10,15,50"
+                                       currentPageReportTemplate="{totalRecords} Roles(s) encontrado(s). Página(s): {currentPage} de {totalPages}"
+                                       paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                       rows="10"
+                                       style="width: 100%;" >
+                            <ace:column headerText="Acciones" style="text-align: left">
+                                <ace:menuButton id="menuButton" effect="slide" effectDuration="200" value="..." >
+                                    <ace:menuItem action="#{rolesCP.modificar(item)}" value="Editar" icon="ui-icon ui-icon-pencil"/>
+                                    <ace:menuItem action="#{rolesCP.borra(item)}" value="Borrar" icon="ui-icon ui-icon-trash"/>
+                                </ace:menuButton>
+                            </ace:column>
+                            <ace:column headerText="Nombre" style="text-align: left" >
+                                <h:outputText value="#{item.nombre}"/>
+                            </ace:column>
+                            <ace:column headerText="Descripción" style="text-align: left">
+                                <h:outputText value="#{item.descripcion}"/>
+                            </ace:column>
+                        </ace:dataTable> 
+                    </h:panelGrid>
+                </ace:panel>
+
+                <ace:dialog 
+                    header="Roles de Funcionarios" 
+                    closable="false"
+                    modal="true"
+                    draggable="true"
+                    showEffect="clip"
+                    hideEffect="fade" 
+                    visible="#{rolesCP.formulario.mostrar}" 
+                    rendered="#{rolesCP.formulario.mostrar}">
+                    <h:panelGrid columns="2" width="100%">
+                        <h:outputText value="Nombre"/>
+                        <h:inputText value="#{rolesCP.rol.nombre}"/>
+                        <h:outputText value="Descripción"/>
+                        <h:inputTextarea value="#{rolesCP.rol.descripcion}"/>
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="2">
+                        <ace:menuBar autoSubmenuDisplay="true" >
+                            <ace:menuItem value="Grabar" icon="ui-icon ui-icon-disk" 
+                                          rendered="#{rolesCP.formulario.nuevo}" 
+                                          action="#{rolesCP.insertar()}"/>
+                            <ace:menuItem value="Grabar" icon="ui-icon ui-icon-disk" 
+                                          action="#{rolesCP.grabar()}" 
+                                          rendered="#{rolesCP.formulario.modificar}" />
+                            <ace:menuItem action="#{rolesCP.borrar()}" 
+                                          value="¿Está seguro de Borrar el registro?" 
+                                          icon="ui-icon ui-icon-trash" 
+                                          rendered="#{rolesCP.formulario.borrar}"/>
+                            <ace:menuItem value="Salir" icon="ui-icon ui-icon-close" 
+                                          action="#{rolesCP.formulario.cancelar()}"/>
+                        </ace:menuBar>
+                        <ace:messages/>
+                    </h:panelGrid>
+                </ace:dialog>
+            </ui:define>
+            <!-- Fin -->
+        </ui:composition>
+    </h:body>
+</html>

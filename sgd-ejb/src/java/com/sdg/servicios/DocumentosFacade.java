@@ -5,7 +5,7 @@
  */
 package com.sdg.servicios;
 
-import com.sgd.entidades.Inventario;
+import com.sgd.entidades.Documentos;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -15,7 +15,7 @@ import javax.persistence.PersistenceContext;
  * @author luis
  */
 @Stateless
-public class InventarioFacade extends AbstractFacade<Inventario> {
+public class DocumentosFacade extends AbstractFacade<Documentos> {
     @PersistenceContext(unitName = "sgd-ejbPU")
     private EntityManager em;
 
@@ -24,8 +24,8 @@ public class InventarioFacade extends AbstractFacade<Inventario> {
         return em;
     }
 
-    public InventarioFacade() {
-        super(Inventario.class);
+    public DocumentosFacade() {
+        super(Documentos.class);
     }
     
 }

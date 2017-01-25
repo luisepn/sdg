@@ -17,6 +17,7 @@ import com.sdg.servicios.EntidadesFacade;
 import com.sdg.utilitarios.Codificador;
 import com.sdg.utilitarios.Formulario;
 import com.sdg.utilitarios.MensajesErrores;
+import com.sgd.entidades.Roles;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -64,6 +65,7 @@ public abstract class PersonasBean implements Serializable {
     protected Entidades existente;
     protected Direcciones direccion;
     protected Entidades entidadSeleccionado;
+    private Roles rolSis;
     @EJB
     protected EntidadesFacade ejbEntidad;
     @EJB
@@ -148,6 +150,7 @@ public abstract class PersonasBean implements Serializable {
             MensajesErrores.advertencia("No tiene autorización para modificar un registro");
         }
         entidad = (Entidades) entidades.getRowData();
+        rolSis = entidad.getRolsistema();
         direccion = entidad.getDireccion();
         if (direccion == null) {
             direccion = new Direcciones();
@@ -163,6 +166,7 @@ public abstract class PersonasBean implements Serializable {
         }
 
         entidad = (Entidades) entidades.getRowData();
+        rolSis = entidad.getRolsistema();
         direccion = entidad.getDireccion();
         formulario.eliminar();
         return null;
@@ -247,6 +251,10 @@ public abstract class PersonasBean implements Serializable {
             MensajesErrores.advertencia("email es obligatorio");
             return true;
         }
+        if (rol == null) {
+            MensajesErrores.advertencia("rol es obligatorio");
+            return true;
+        }
 //        if ((entidad.getUserid() == null) || (entidad.getUserid().isEmpty())) {
 //            MensajesErrores.advertencia("User ID es obligatorio");
 //            return true;
@@ -327,6 +335,7 @@ public abstract class PersonasBean implements Serializable {
 
             }
             Codificador c = new Codificador();
+            entidad.setRolsistema(rolSis);
             entidad.setPwd(c.getEncoded(entidad.getPin(), "MD5"));
             ejbEntidad.create(entidad, seguridadBean.getEntidad().getUserid());
         } catch (InsertarException | ConsultarException ex) {
@@ -359,9 +368,11 @@ public abstract class PersonasBean implements Serializable {
                     ejbDireccion.edit(direccion, seguridadBean.getEntidad().getUserid());
                 }
                 entidad.setDireccion(direccion);
+                rolSis = entidad.getRolsistema();
                 ejbEntidad.edit(entidad, seguridadBean.getEntidad().getUserid());
 
             } else {
+                rolSis = entidad.getRolsistema();
                 ejbEntidad.edit(entidad, seguridadBean.getEntidad().getUserid());
             }
 
@@ -822,6 +833,20 @@ public abstract class PersonasBean implements Serializable {
      */
     public void setPerfil(Perfil perfil) {
         this.perfil = perfil;
+    }
+
+    /**
+     * @return the rolSis
+     */
+    public Roles getRolSis() {
+        return rolSis;
+    }
+
+    /**
+     * @param rolSis the rolSis to set
+     */
+    public void setRolSis(Roles rolSis) {
+        this.rolSis = rolSis;
     }
 
 }

@@ -15,6 +15,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -47,6 +48,15 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Entidades.findByActivo", query = "SELECT e FROM Entidades e WHERE e.activo = :activo"),
     @NamedQuery(name = "Entidades.findByRol", query = "SELECT e FROM Entidades e WHERE e.rol = :rol")})
 public class Entidades implements Serializable {
+    @OneToMany(mappedBy = "responsable")
+    private List<Procesos> procesosList;
+    @OneToMany(mappedBy = "denunciante")
+    private List<Procesos> procesosList1;
+    @OneToMany(mappedBy = "denunciado")
+    private List<Procesos> procesosList2;
+    @JoinColumn(name = "rolsistema", referencedColumnName = "id")
+    @ManyToOne
+    private Roles rolsistema;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -231,6 +241,41 @@ public class Entidades implements Serializable {
     @Override
     public String toString() {
         return apellidos + " " + nombres;
+    }
+
+    @XmlTransient
+    public List<Procesos> getProcesosList() {
+        return procesosList;
+    }
+
+    public void setProcesosList(List<Procesos> procesosList) {
+        this.procesosList = procesosList;
+    }
+
+    @XmlTransient
+    public List<Procesos> getProcesosList1() {
+        return procesosList1;
+    }
+
+    public void setProcesosList1(List<Procesos> procesosList1) {
+        this.procesosList1 = procesosList1;
+    }
+
+    @XmlTransient
+    public List<Procesos> getProcesosList2() {
+        return procesosList2;
+    }
+
+    public void setProcesosList2(List<Procesos> procesosList2) {
+        this.procesosList2 = procesosList2;
+    }
+
+    public Roles getRolsistema() {
+        return rolsistema;
+    }
+
+    public void setRolsistema(Roles rolsistema) {
+        this.rolsistema = rolsistema;
     }
     
 }

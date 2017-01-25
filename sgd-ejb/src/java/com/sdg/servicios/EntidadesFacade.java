@@ -5,8 +5,8 @@
  */
 package com.sdg.servicios;
 
-import com.sgd.entidades.Entidades;
 import com.sdg.excepciones.ConsultarException;
+import com.sgd.entidades.Entidades;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,12 +16,12 @@ import javax.persistence.PersistenceContext;
 
 /**
  *
- * @author limon
+ * @author luis
  */
 @Stateless
 public class EntidadesFacade extends AbstractFacade<Entidades> {
 
-    @PersistenceContext(unitName = "sinvent-ejbPU")
+    @PersistenceContext(unitName = "sgd-ejbPU")
     private EntityManager em;
 
     @Override

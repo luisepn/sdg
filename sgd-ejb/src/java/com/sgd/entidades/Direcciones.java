@@ -40,6 +40,14 @@ import javax.xml.bind.annotation.XmlTransient;
     @NamedQuery(name = "Direcciones.findByMovil", query = "SELECT d FROM Direcciones d WHERE d.movil = :movil"),
     @NamedQuery(name = "Direcciones.findByCiudad", query = "SELECT d FROM Direcciones d WHERE d.ciudad = :ciudad")})
 public class Direcciones implements Serializable {
+    @OneToMany(mappedBy = "direccion")
+    private List<Entidades> entidadesList;
+    @Size(max = 2147483647)
+    @Column(name = "edificio")
+    private String edificio;
+    @Size(max = 2147483647)
+    @Column(name = "piso")
+    private String piso;
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -193,6 +201,31 @@ public class Direcciones implements Serializable {
     @Override
     public String toString() {
         return primaria + " " + numero + " " + secundaria;
+    }
+
+    public String getEdificio() {
+        return edificio;
+    }
+
+    public void setEdificio(String edificio) {
+        this.edificio = edificio;
+    }
+
+    public String getPiso() {
+        return piso;
+    }
+
+    public void setPiso(String piso) {
+        this.piso = piso;
+    }
+
+    @XmlTransient
+    public List<Entidades> getEntidadesList() {
+        return entidadesList;
+    }
+
+    public void setEntidadesList(List<Entidades> entidadesList) {
+        this.entidadesList = entidadesList;
     }
     
 }
