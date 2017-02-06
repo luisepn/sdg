@@ -29,7 +29,7 @@ import javax.naming.NamingException;
 
 /**
  *
- * @author edwin
+ * @author luis
  */
 @Stateless
 @LocalBean
@@ -54,7 +54,7 @@ public class CorreoFacade {
 
         message.setFrom(new InternetAddress(
                 correo,
-                "Autodeclaración Bomberos"));
+                "Sistema de Gestión Documental"));
         message.setRecipients(RecipientType.TO, InternetAddress.parse(email, false));
         Multipart multipart = new MimeMultipart("alternative");
         MimeBodyPart textPart = new MimeBodyPart();

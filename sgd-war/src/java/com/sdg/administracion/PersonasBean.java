@@ -12,6 +12,7 @@ import com.sdg.excepciones.ConsultarException;
 import com.sdg.excepciones.GrabarException;
 import com.sdg.excepciones.InsertarException;
 import com.sdg.seguridad.SeguridadBean;
+import com.sdg.servicios.CorreoFacade;
 import com.sdg.servicios.DireccionesFacade;
 import com.sdg.servicios.EntidadesFacade;
 import com.sdg.utilitarios.Codificador;
@@ -20,6 +21,7 @@ import com.sdg.utilitarios.MensajesErrores;
 import com.sgd.entidades.Roles;
 
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -35,6 +37,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.model.SelectItem;
+import javax.mail.MessagingException;
 import org.icefaces.ace.model.table.LazyDataModel;
 import org.icefaces.ace.model.table.SortCriteria;
 
@@ -65,11 +68,13 @@ public abstract class PersonasBean implements Serializable {
     protected Entidades existente;
     protected Direcciones direccion;
     protected Entidades entidadSeleccionado;
-    private Roles rolSis;
+//    private Roles rolSis;
     @EJB
     protected EntidadesFacade ejbEntidad;
     @EJB
     protected DireccionesFacade ejbDireccion;
+    @EJB
+    protected CorreoFacade ejbCorreo;
 
     //Autocompletar
     protected List listaUsuarios;
@@ -150,7 +155,7 @@ public abstract class PersonasBean implements Serializable {
             MensajesErrores.advertencia("No tiene autorización para modificar un registro");
         }
         entidad = (Entidades) entidades.getRowData();
-        rolSis = entidad.getRolsistema();
+//        rolSis = entidad.getRolsistema();
         direccion = entidad.getDireccion();
         if (direccion == null) {
             direccion = new Direcciones();
@@ -166,7 +171,7 @@ public abstract class PersonasBean implements Serializable {
         }
 
         entidad = (Entidades) entidades.getRowData();
-        rolSis = entidad.getRolsistema();
+//        rolSis = entidad.getRolsistema();
         direccion = entidad.getDireccion();
         formulario.eliminar();
         return null;
@@ -335,12 +340,16 @@ public abstract class PersonasBean implements Serializable {
 
             }
             Codificador c = new Codificador();
-            entidad.setRolsistema(rolSis);
+//            entidad.setRolsistema(rolSis);
             entidad.setPwd(c.getEncoded(entidad.getPin(), "MD5"));
             ejbEntidad.create(entidad, seguridadBean.getEntidad().getUserid());
+            ejbCorreo.enviarCorreo(entidad.getEmail(), "Registro de usuarios", "Usted se encuentra registrado en el Sistema de Gestión Documental " + seguridadBean.getCentro().getNombre() + (entidad.getRolsistema() != null ? ", con el rol de " + entidad.getRolsistema().getNombre() + "." : "."));
         } catch (InsertarException | ConsultarException ex) {
             MensajesErrores.fatal(ex.getMessage() + "-" + ex.getCause());
             Logger.getLogger("").log(Level.SEVERE, null, ex);
+        } catch (MessagingException | UnsupportedEncodingException ex) {
+            MensajesErrores.fatal(ex.getMessage() + "-" + ex.getCause());
+            Logger.getLogger(PersonasBean.class.getName()).log(Level.SEVERE, null, ex);
         }
         formulario.cancelar();
         buscar();
@@ -368,11 +377,11 @@ public abstract class PersonasBean implements Serializable {
                     ejbDireccion.edit(direccion, seguridadBean.getEntidad().getUserid());
                 }
                 entidad.setDireccion(direccion);
-                rolSis = entidad.getRolsistema();
+//                rolSis = entidad.getRolsistema();
                 ejbEntidad.edit(entidad, seguridadBean.getEntidad().getUserid());
 
             } else {
-                rolSis = entidad.getRolsistema();
+//                rolSis = entidad.getRolsistema();
                 ejbEntidad.edit(entidad, seguridadBean.getEntidad().getUserid());
             }
 
@@ -833,20 +842,6 @@ public abstract class PersonasBean implements Serializable {
      */
     public void setPerfil(Perfil perfil) {
         this.perfil = perfil;
-    }
-
-    /**
-     * @return the rolSis
-     */
-    public Roles getRolSis() {
-        return rolSis;
-    }
-
-    /**
-     * @param rolSis the rolSis to set
-     */
-    public void setRolSis(Roles rolSis) {
-        this.rolSis = rolSis;
     }
 
 }
