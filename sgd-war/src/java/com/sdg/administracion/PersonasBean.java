@@ -343,7 +343,8 @@ public abstract class PersonasBean implements Serializable {
 //            entidad.setRolsistema(rolSis);
             entidad.setPwd(c.getEncoded(entidad.getPin(), "MD5"));
             ejbEntidad.create(entidad, seguridadBean.getEntidad().getUserid());
-            ejbCorreo.enviarCorreo(entidad.getEmail(), "Registro de usuarios", "Usted se encuentra registrado en el Sistema de Gestión Documental " + seguridadBean.getCentro().getNombre() + (entidad.getRolsistema() != null ? ", con el rol de " + entidad.getRolsistema().getNombre() + "." : "."));
+            ejbCorreo.enviarCorreo(entidad.getEmail(), "Registro de usuarios", "Bienvenido " + entidad.toString() + ", usted se encuentra registrado en el Sistema de Gestión Documental " + seguridadBean.getCentro().getNombre() + (entidad.getRolsistema() != null ? ", con el rol de " + entidad.getRolsistema().getNombre() + "." : ".") + "\n"
+                    + "Su usuario es: " + entidad.getUserid() + " y su contraseña es su número de cédula, se le pedirá que cambie su clave en el primer ingreso.");
         } catch (InsertarException | ConsultarException ex) {
             MensajesErrores.fatal(ex.getMessage() + "-" + ex.getCause());
             Logger.getLogger("").log(Level.SEVERE, null, ex);
